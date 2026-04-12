@@ -7,10 +7,10 @@ class ApprovalStep < ApplicationRecord
 
   STATUSES = %w[pending approved rejected skipped].freeze
   validates :status, inclusion: { in: STATUSES }
-  validates :level, numericality: { only_integer: true, greater_than: 0 }
+  validates :level, presence: true, numericality: { only_integer: true, greater_than: 0 }
 
   scope :pending, -> { where(status: 'pending') }
-  scope :ordered_by_level, -> { order(:level) }
+  scope :ordered, -> { order(:level) }
 
   def approve!(comment: nil)
     update!(status: 'approved', comment: comment, decided_at: Time.current)
