@@ -4,7 +4,7 @@ class Invoice < ApplicationRecord
 
   belongs_to :tenant
   belongs_to :purchase_order, optional: true
-  belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: 'User'
   has_many :invoice_items, dependent: :destroy
   has_many :audit_logs, as: :auditable
 
@@ -26,7 +26,7 @@ class Invoice < ApplicationRecord
     event :flag_exception do
       transitions from: :processing, to: :exception
     end
-    event :approve_invoice do
+    event :approve_payment do
       transitions from: :matched, to: :approved
     end
     event :mark_paid do
@@ -35,6 +35,10 @@ class Invoice < ApplicationRecord
   end
 
   def matched?
-    price_match && quantity_match && vendor_match && !is_duplicate
+    price_match? && quantity_match? && vendor_match? && !is_duplicate?
+  end
+
+  def exceptions
+    match_result['exceptions'] || []
   end
 end
