@@ -1,41 +1,44 @@
 class ApprovalChainService
   def initialize(requisition)
     @requisition = requisition
+    @tenant = requisition.tenant
   end
 
   def build_chain!
-    rules = ApprovalRule
-              .for_amount(@requisition.total_amount)
-              .for_department(@requisition.department)
-              .order(:level)
+    rules = ApprovalRule.where(tenant: @tenant)
+                        .where('department IS NULL OR department = ?', @requisition.department)
+                        .where('min_amount <= ?', @requisition.total_amount)
+                        .where('max_amount IS NULL OR max_amount >= ?', @requisition.total_amount)
+                        .order(:level)
 
-    steps = rules.filter_map do |rule|
-      approver = User.where(role: rule.approver_role).first
+    raise 'No approval rules configured for this amount/department' if rules.empty?
+
+    @requisition.approval_steps.destroy_all
+
+    steps = rules.map do |rule|
+      approver = User.where(tenant: @tenant, role: rule.approver_role)
+                     .where.not(id: @requisition.requester_id)
+                     .first
       next unless approver
 
       ApprovalStep.create!(
-        tenant: @requisition.tenant,
+        tenant: @tenant,
         requisition: @requisition,
         approver: approver,
         level: rule.level,
         status: 'pending'
       )
-    end
+    end.compact
 
-    if steps.any?
-      @requisition.update!(current_approver: steps.first.approver)
-    end
-
+    first_step = steps.min_by(&:level)
+    @requisition.update!(current_approver: first_step&.approver)
     steps
   end
 
   def advance!(approved_by:, comment: nil)
-    current_step = @requisition.approval_steps.where(status: 'pending').order(:level).first
-    return false unless current_step
-
-    if current_step.approver_id == @requisition.requester_id && @requisition.self_approval_blocked
-      raise StandardError, 'Self-approval is not allowed'
-    end
+    current_step = pending_step
+    raise 'No pending approval step' unless current_step
+    raise 'Self-approval is not allowed' if current_step.approver_id == @requisition.requester_id
 
     current_step.approve!(comment: comment)
 
@@ -46,16 +49,18 @@ class ApprovalChainService
       @requisition.approve!
       @requisition.update!(current_approver: nil)
     end
-
-    true
   end
 
   def reject!(rejected_by:, comment: nil)
-    current_step = @requisition.approval_steps.where(status: 'pending').order(:level).first
-    current_step&.reject!(comment: comment)
-
-    @requisition.approval_steps.where(status: 'pending').update_all(status: 'skipped')
+    step = pending_step
+    step&.reject!(comment: comment)
     @requisition.reject!
     @requisition.update!(current_approver: nil)
+  end
+
+  private
+
+  def pending_step
+    @requisition.approval_steps.where(status: 'pending').order(:level).first
   end
 end
