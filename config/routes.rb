@@ -3,13 +3,13 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   mount Sidekiq::Web => '/sidekiq'
 
-  get 'up' => 'rails/health#show', as: :rails_health_check
-
   namespace :api do
     namespace :v1 do
       post 'auth/register', to: 'auth#register'
       post 'auth/login',    to: 'auth#login'
       get  'auth/me',       to: 'auth#me'
+
+      get 'dashboard/stats', to: 'dashboard#stats'
 
       resources :requisitions do
         member do
@@ -26,17 +26,18 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :goods_receipts
+      resources :goods_receipts, only: %i[index show create]
 
       resources :invoices do
         member do
           post :process_invoice
+          post :approve_payment
         end
       end
 
-      resources :audit_logs, only: [:index, :show]
-
-      get 'dashboard/stats', to: 'dashboard#stats'
+      resources :audit_logs, only: %i[index show]
     end
   end
+
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end
