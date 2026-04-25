@@ -2,34 +2,36 @@ module Api
   module V1
     class AuditLogsController < ApplicationController
       def index
-        logs = AuditLog.where(tenant: current_user.tenant)
-                       .includes(:user)
-                       .recent
-        logs = logs.where(auditable_type: params[:resource]) if params[:resource].present?
+        authorize AuditLog
+        logs = policy_scope(AuditLog).includes(:user)
+                                      .order(created_at: :desc)
+                                      .page(params[:page]).per(params[:per_page] || 50)
+        logs = logs.where(auditable_type: params[:resource_type]) if params[:resource_type].present?
         logs = logs.where(user_id: params[:user_id]) if params[:user_id].present?
-        logs = logs.where(action: params[:action_filter]) if params[:action_filter].present?
-        paginated = logs.page(params[:page]).per(25)
         render json: {
-          audit_logs: paginated.map { |l| log_json(l) },
-          meta: { total: paginated.total_count, page: paginated.current_page, pages: paginated.total_pages }
+          audit_logs: logs.map { |l| log_json(l) },
+          meta: { current_page: logs.current_page, total_pages: logs.total_pages, total_count: logs.total_count }
         }
       end
 
       def show
         log = AuditLog.find(params[:id])
-        render json: log_json(log)
+        authorize log
+        render json: log_json(log, detailed: true)
       end
 
       private
 
-      def log_json(l)
-        {
+      def log_json(l, detailed: false)
+        json = {
           id: l.id, action: l.action,
-          user: { id: l.user_id, name: l.user&.name },
           auditable_type: l.auditable_type, auditable_id: l.auditable_id,
-          changes_data: l.changes_data, ip_address: l.ip_address,
-          created_at: l.created_at
+          user: { id: l.user_id, name: l.user&.name },
+          ip_address: l.ip_address, created_at: l.created_at
         }
+        json[:changes_data] = l.changes_data if detailed
+        json[:metadata] = l.metadata if detailed
+        json
       end
     end
   end
