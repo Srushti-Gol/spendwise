@@ -1,6 +1,11 @@
 class Requisition < ApplicationRecord
   include AASM
+  include PgSearch::Model
   acts_as_tenant(:tenant)
+
+  pg_search_scope :search_by_title,
+                  against: :title,
+                  using: { trigram: { threshold: 0.1 } }
 
   belongs_to :tenant
   belongs_to :requester, class_name: 'User'

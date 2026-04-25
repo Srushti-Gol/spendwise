@@ -1,6 +1,11 @@
 class Invoice < ApplicationRecord
   include AASM
+  include PgSearch::Model
   acts_as_tenant(:tenant)
+
+  pg_search_scope :search_by_vendor,
+                  against: :vendor,
+                  using: { trigram: { threshold: 0.1 } }
 
   belongs_to :tenant
   belongs_to :purchase_order, optional: true
