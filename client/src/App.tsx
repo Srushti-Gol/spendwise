@@ -8,7 +8,6 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Requisitions from './pages/Requisitions';
 import PurchaseOrders from './pages/PurchaseOrders';
-import GoodsReceipts from './pages/GoodsReceipts';
 import Invoices from './pages/Invoices';
 import AuditLog from './pages/AuditLog';
 
@@ -16,7 +15,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', fontSize: '14px' } }} />
+        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -25,7 +24,6 @@ export default function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/requisitions" element={<Requisitions />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
-              <Route path="/goods-receipts" element={<GoodsReceipts />} />
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/audit-log" element={<AuditLog />} />
             </Route>
