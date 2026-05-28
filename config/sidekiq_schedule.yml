@@ -1,0 +1,11 @@
+po_reminder:
+  cron: "0 9 * * 1"
+  class: PoReminderJob
+  queue: low
+  description: "Flag purchase orders open for more than 7 days"
+
+audit_log_cleanup:
+  cron: "0 2 * * 0"
+  class: AuditLogCleanupJob
+  queue: low
+  description: "Purge audit logs older than 365 days"
