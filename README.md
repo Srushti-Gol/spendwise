@@ -1,10 +1,62 @@
-# SpendWise — Multi-Tenant Procure-to-Pay Platform
+<div align="center">
 
-A production-grade **procure-to-pay (P2P)** platform built with **Rails 8**, **React 18 + TypeScript**, **PostgreSQL 16**, **Sidekiq**, and **Redis**. It covers the full procurement cycle: requisition creation, multi-level approval routing, purchase-order generation, goods receipt, AI-assisted invoice extraction, and automated 3-way matching.
+<img src="https://img.shields.io/badge/Rails-8.1-CC0000?style=for-the-badge&logo=rubyonrails&logoColor=white" />
+<img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+<img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
+<img src="https://img.shields.io/badge/Sidekiq-7-B1003E?style=for-the-badge&logoColor=white" />
+<img src="https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+
+<h1>SpendWise — Multi-Tenant Procure-to-Pay Platform</h1>
+
+<p>A production-grade <strong>procure-to-pay (P2P)</strong> platform covering the full procurement cycle: requisition creation, multi-level approval routing, purchase-order generation, goods receipt, AI-assisted invoice extraction, and automated 3-way matching.</p>
+
+<a href="#-screenshots">Screenshots</a> ·
+<a href="#-features">Features</a> ·
+<a href="#-tech-stack">Tech Stack</a> ·
+<a href="#-performance">Performance</a> ·
+<a href="#-getting-started">Getting Started</a> ·
+<a href="#-api">API</a>
+
+</div>
 
 ---
 
-## Tech Stack
+## 📸 Screenshots
+
+| Login | Dashboard |
+|-------|-----------|
+| ![Login](screenshots/01_login.png) | ![Dashboard](screenshots/02_dashboard.png) |
+
+| Requisitions (Approval Inbox) | Purchase Orders |
+|-------------------------------|-----------------|
+| ![Requisitions](screenshots/03_requisitions.png) | ![Purchase Orders](screenshots/04_purchase_orders.png) |
+
+| Invoices (3-Way Match Status) | Audit Log |
+|-------------------------------|-----------|
+| ![Invoices](screenshots/05_invoices.png) | ![Audit Log](screenshots/06_audit_log.png) |
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 📋 **Requisitions** | Create purchase requests with line items; submit for multi-level approval |
+| ✅ **Multi-Level Approvals** | Configurable chains by department + amount threshold; AASM state machine; self-approval blocked |
+| 📦 **Purchase Orders** | Auto-convert approved requisitions; track ordered vs received with configurable tolerances |
+| 🚚 **Goods Receipts** | Record supplier deliveries per line item; auto-updates PO status |
+| 🤖 **AI Invoice Extraction** | Sidekiq pipeline reads PDFs/images via GPT-4o-mini / Gemini 2.5 Flash against a strict JSON schema |
+| 🔍 **Automated 3-Way Match** | Auto-links invoice ↔ PO; validates price, quantity, vendor with configurable tolerances; flags duplicates |
+| 🏢 **Multi-Tenancy** | Row-level isolation via `acts_as_tenant`; enforced in Sidekiq jobs; verified by cross-tenant request specs |
+| 🔐 **RBAC** | Pundit policies on every controller action (staff / manager / finance / director / admin) |
+| 📜 **Audit Trail** | Append-only log of every state transition with actor, timestamp, IP, and changes |
+| ⚡ **Performance** | 706× faster approval inbox; 2,348× faster audit log — see [BENCHMARKS.md](BENCHMARKS.md) |
+
+---
+
+## 🛠 Tech Stack
 
 | Layer        | Technology                                           |
 |-------------|------------------------------------------------------|
