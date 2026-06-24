@@ -6,9 +6,9 @@ class PurchaseOrderPolicy < ApplicationPolicy
   def destroy?      = role_at_least?('admin')
   def send_to_vendor? = role_at_least?('finance') && record.draft?
 
-  class Scope < Scope
+  class Scope < ApplicationPolicy::Scope
     def resolve
-      scope.where(tenant: user.tenant)
+      @scope.where(tenant: @user.tenant)
     end
   end
 end

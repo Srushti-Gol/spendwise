@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Shield, Filter } from 'lucide-react';
 
 interface AuditEntry {
@@ -23,7 +23,7 @@ export default function AuditLog() {
 
   useEffect(() => {
     const params = resourceFilter ? `?resource_type=${resourceFilter}` : '';
-    axios.get(`/api/v1/audit_logs${params}`)
+    api.get(`/audit_logs${params}`)
          .then(r => { setLogs(r.data.audit_logs); setLoading(false); })
          .catch(() => setLoading(false));
   }, [resourceFilter]);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Plus, Package, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -21,7 +21,7 @@ export default function PurchaseOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/v1/purchase_orders').then(r => { setPOs(r.data.purchase_orders); setLoading(false); })
+    api.get('/purchase_orders').then(r => { setPOs(r.data.purchase_orders); setLoading(false); })
          .catch(() => { toast.error('Failed to load purchase orders'); setLoading(false); });
   }, []);
 
