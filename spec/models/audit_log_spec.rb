@@ -13,7 +13,7 @@ RSpec.describe AuditLog, type: :model do
           auditable: req,
           user: user,
           ip_address: '127.0.0.1',
-          changes_data: { status: ['draft', 'pending'] }
+          changes_data: { status: [ 'draft', 'pending' ] }
         )
       }.to change(AuditLog, :count).by(1)
     end

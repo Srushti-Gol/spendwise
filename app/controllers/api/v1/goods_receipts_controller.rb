@@ -17,7 +17,7 @@ module Api
         receipt = GoodsReceipt.new(receipt_params.merge(received_by: current_user))
         authorize receipt
         if receipt.save
-          audit('create', receipt)
+          audit("create", receipt)
           render json: receipt_json(receipt), status: :created
         else
           render json: { errors: receipt.errors.full_messages }, status: :unprocessable_entity

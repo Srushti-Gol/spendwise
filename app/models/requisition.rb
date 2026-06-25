@@ -8,8 +8,8 @@ class Requisition < ApplicationRecord
                   using: { trigram: { threshold: 0.1 } }
 
   belongs_to :tenant
-  belongs_to :requester, class_name: 'User'
-  belongs_to :current_approver, class_name: 'User', optional: true
+  belongs_to :requester, class_name: "User"
+  belongs_to :current_approver, class_name: "User", optional: true
   has_many :requisition_items, dependent: :destroy
   has_many :approval_steps, dependent: :destroy
   has_one :purchase_order

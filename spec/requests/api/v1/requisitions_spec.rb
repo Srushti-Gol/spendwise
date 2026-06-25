@@ -38,7 +38,7 @@ RSpec.describe 'Api::V1::Requisitions', type: :request do
   describe 'POST /api/v1/requisitions' do
     let(:params) do
       { requisition: { title: 'New Laptops', department: 'Engineering', total_amount: 5000,
-                       requisition_items_attributes: [{ description: 'MacBook', quantity: 2, unit_price: 2500, total_price: 5000 }] } }
+                       requisition_items_attributes: [ { description: 'MacBook', quantity: 2, unit_price: 2500, total_price: 5000 } ] } }
     end
 
     it 'creates a requisition' do

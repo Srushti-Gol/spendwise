@@ -19,7 +19,7 @@ module Api
         invoice = Invoice.new(invoice_params.merge(created_by: current_user))
         authorize invoice
         if invoice.save
-          audit('create', invoice)
+          audit("create", invoice)
           render json: invoice_json(invoice), status: :created
         else
           render json: { errors: invoice.errors.full_messages }, status: :unprocessable_entity
@@ -29,7 +29,7 @@ module Api
       def update
         authorize @invoice
         if @invoice.update(invoice_params)
-          audit('update', @invoice)
+          audit("update", @invoice)
           render json: invoice_json(@invoice)
         else
           render json: { errors: @invoice.errors.full_messages }, status: :unprocessable_entity
@@ -45,13 +45,13 @@ module Api
       def process_invoice
         authorize @invoice, :process_invoice?
         InvoiceExtractionJob.perform_later(@invoice.id, @invoice.tenant_id)
-        render json: { message: 'Invoice processing queued', invoice_id: @invoice.id }
+        render json: { message: "Invoice processing queued", invoice_id: @invoice.id }
       end
 
       def approve_payment
         authorize @invoice, :approve_payment?
         @invoice.approve_payment!
-        audit('approve_payment', @invoice)
+        audit("approve_payment", @invoice)
         render json: invoice_json(@invoice)
       end
 

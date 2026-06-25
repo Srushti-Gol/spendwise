@@ -23,7 +23,7 @@ module Api
         authorize requisition
 
         if requisition.save
-          audit('create', requisition)
+          audit("create", requisition)
           render json: requisition_json(requisition), status: :created
         else
           render json: { errors: requisition.errors.full_messages }, status: :unprocessable_entity
@@ -33,7 +33,7 @@ module Api
       def update
         authorize @requisition
         if @requisition.update(requisition_params)
-          audit('update', @requisition)
+          audit("update", @requisition)
           render json: requisition_json(@requisition)
         else
           render json: { errors: @requisition.errors.full_messages }, status: :unprocessable_entity
@@ -43,7 +43,7 @@ module Api
       def destroy
         authorize @requisition
         @requisition.destroy
-        audit('delete', @requisition)
+        audit("delete", @requisition)
         head :no_content
       end
 
@@ -51,7 +51,7 @@ module Api
         authorize @requisition, :submit?
         ApprovalChainService.new(@requisition).build_chain!
         @requisition.submit!
-        audit('submit', @requisition, { status: 'pending' })
+        audit("submit", @requisition, { status: "pending" })
         render json: requisition_json(@requisition)
       rescue => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -63,7 +63,7 @@ module Api
           approved_by: current_user,
           comment: params[:comment]
         )
-        audit('approve', @requisition, { comment: params[:comment] })
+        audit("approve", @requisition, { comment: params[:comment] })
         render json: requisition_json(@requisition)
       rescue => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -75,7 +75,7 @@ module Api
           rejected_by: current_user,
           comment: params[:comment]
         )
-        audit('reject', @requisition, { comment: params[:comment] })
+        audit("reject", @requisition, { comment: params[:comment] })
         render json: requisition_json(@requisition)
       rescue => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -84,7 +84,7 @@ module Api
       def cancel
         authorize @requisition, :cancel?
         @requisition.cancel!
-        audit('cancel', @requisition)
+        audit("cancel", @requisition)
         render json: requisition_json(@requisition)
       end
 

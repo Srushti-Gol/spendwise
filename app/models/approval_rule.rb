@@ -11,7 +11,7 @@ class ApprovalRule < ApplicationRecord
 
   scope :ordered, -> { order(:level) }
   scope :for_amount, ->(amount) {
-    where('min_amount <= ?', amount)
-      .where('max_amount IS NULL OR max_amount >= ?', amount)
+    where("min_amount <= ?", amount)
+      .where("max_amount IS NULL OR max_amount >= ?", amount)
   }
 end

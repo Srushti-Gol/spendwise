@@ -4,7 +4,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :tenant
   belongs_to :requisition, optional: true
-  belongs_to :created_by, class_name: 'User'
+  belongs_to :created_by, class_name: "User"
   has_many :purchase_order_items, dependent: :destroy
   has_many :goods_receipts, dependent: :destroy
   has_many :invoices, dependent: :nullify
@@ -37,6 +37,6 @@ class PurchaseOrder < ApplicationRecord
 
   def total_received_quantity
     goods_receipts.joins(:goods_receipt_items)
-                  .sum('goods_receipt_items.quantity_received')
+                  .sum("goods_receipt_items.quantity_received")
   end
 end

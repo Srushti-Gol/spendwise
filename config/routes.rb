@@ -1,15 +1,15 @@
-require 'sidekiq/web'
+require "sidekiq/web"
 
 Rails.application.routes.draw do
-  mount Sidekiq::Web => '/sidekiq'
+  mount Sidekiq::Web => "/sidekiq"
 
   namespace :api do
     namespace :v1 do
-      post 'auth/register', to: 'auth#register'
-      post 'auth/login',    to: 'auth#login'
-      get  'auth/me',       to: 'auth#me'
+      post "auth/register", to: "auth#register"
+      post "auth/login",    to: "auth#login"
+      get  "auth/me",       to: "auth#me"
 
-      get 'dashboard/stats', to: 'dashboard#stats'
+      get "dashboard/stats", to: "dashboard#stats"
 
       resources :requisitions do
         member do
@@ -39,5 +39,5 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'up' => 'rails/health#show', as: :rails_health_check
+  get "up" => "rails/health#show", as: :rails_health_check
 end

@@ -28,7 +28,7 @@ RSpec.describe ApprovalChainService, type: :service do
       steps = described_class.new(req).build_chain!
 
       expect(steps.length).to eq(2)
-      expect(steps.map(&:level)).to eq([1, 2])
+      expect(steps.map(&:level)).to eq([ 1, 2 ])
     end
   end
 

@@ -12,6 +12,6 @@ class CreateUsers < ActiveRecord::Migration[8.1]
     end
     add_index :users, :email, unique: true
     add_index :users, :jti, unique: true
-    add_index :users, [:tenant_id, :role]
+    add_index :users, [ :tenant_id, :role ]
   end
 end

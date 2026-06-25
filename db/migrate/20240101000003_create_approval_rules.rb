@@ -9,6 +9,6 @@ class CreateApprovalRules < ActiveRecord::Migration[8.1]
       t.integer :level, null: false
       t.timestamps
     end
-    add_index :approval_rules, [:tenant_id, :department, :level]
+    add_index :approval_rules, [ :tenant_id, :department, :level ]
   end
 end

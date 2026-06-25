@@ -3,7 +3,7 @@ class GoodsReceipt < ApplicationRecord
 
   belongs_to :tenant
   belongs_to :purchase_order
-  belongs_to :received_by, class_name: 'User'
+  belongs_to :received_by, class_name: "User"
   has_many :goods_receipt_items, dependent: :destroy
   has_many :audit_logs, as: :auditable
 

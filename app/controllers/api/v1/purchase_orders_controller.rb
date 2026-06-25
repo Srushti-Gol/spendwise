@@ -19,7 +19,7 @@ module Api
         po = PurchaseOrder.new(po_params.merge(created_by: current_user))
         authorize po
         if po.save
-          audit('create', po)
+          audit("create", po)
           render json: po_json(po), status: :created
         else
           render json: { errors: po.errors.full_messages }, status: :unprocessable_entity
@@ -29,7 +29,7 @@ module Api
       def update
         authorize @po
         if @po.update(po_params)
-          audit('update', @po)
+          audit("update", @po)
           render json: po_json(@po)
         else
           render json: { errors: @po.errors.full_messages }, status: :unprocessable_entity
@@ -45,7 +45,7 @@ module Api
       def send_to_vendor
         authorize @po, :update?
         @po.send_to_vendor!
-        audit('send_to_vendor', @po)
+        audit("send_to_vendor", @po)
         render json: po_json(@po)
       end
 

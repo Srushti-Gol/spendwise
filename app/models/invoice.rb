@@ -9,7 +9,7 @@ class Invoice < ApplicationRecord
 
   belongs_to :tenant
   belongs_to :purchase_order, optional: true
-  belongs_to :created_by, class_name: 'User'
+  belongs_to :created_by, class_name: "User"
   has_many :invoice_items, dependent: :destroy
   has_many :audit_logs, as: :auditable
 
@@ -44,6 +44,6 @@ class Invoice < ApplicationRecord
   end
 
   def exceptions
-    match_result['exceptions'] || []
+    match_result["exceptions"] || []
   end
 end

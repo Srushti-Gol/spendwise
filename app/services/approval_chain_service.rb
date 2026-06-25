@@ -6,12 +6,12 @@ class ApprovalChainService
 
   def build_chain!
     rules = ApprovalRule.where(tenant: @tenant)
-                        .where('department IS NULL OR department = ?', @requisition.department)
-                        .where('min_amount <= ?', @requisition.total_amount)
-                        .where('max_amount IS NULL OR max_amount >= ?', @requisition.total_amount)
+                        .where("department IS NULL OR department = ?", @requisition.department)
+                        .where("min_amount <= ?", @requisition.total_amount)
+                        .where("max_amount IS NULL OR max_amount >= ?", @requisition.total_amount)
                         .order(:level)
 
-    raise 'No approval rules configured for this amount/department' if rules.empty?
+    raise "No approval rules configured for this amount/department" if rules.empty?
 
     @requisition.approval_steps.destroy_all
 
@@ -26,7 +26,7 @@ class ApprovalChainService
         requisition: @requisition,
         approver: approver,
         level: rule.level,
-        status: 'pending'
+        status: "pending"
       )
     end.compact
 
@@ -37,12 +37,12 @@ class ApprovalChainService
 
   def advance!(approved_by:, comment: nil)
     current_step = pending_step
-    raise 'No pending approval step' unless current_step
-    raise 'Self-approval is not allowed' if current_step.approver_id == @requisition.requester_id
+    raise "No pending approval step" unless current_step
+    raise "Self-approval is not allowed" if current_step.approver_id == @requisition.requester_id
 
     current_step.approve!(comment: comment)
 
-    next_step = @requisition.approval_steps.where(status: 'pending').order(:level).first
+    next_step = @requisition.approval_steps.where(status: "pending").order(:level).first
     if next_step
       @requisition.update!(current_approver: next_step.approver)
     else
@@ -61,6 +61,6 @@ class ApprovalChainService
   private
 
   def pending_step
-    @requisition.approval_steps.where(status: 'pending').order(:level).first
+    @requisition.approval_steps.where(status: "pending").order(:level).first
   end
 end

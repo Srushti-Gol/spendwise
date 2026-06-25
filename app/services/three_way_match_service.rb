@@ -53,7 +53,7 @@ class ThreeWayMatchService
 
     total_received = @po.goods_receipts
                         .joins(:goods_receipt_items)
-                        .sum('goods_receipt_items.quantity_received').to_f
+                        .sum("goods_receipt_items.quantity_received").to_f
 
     (total_received - total_ordered).abs / total_ordered
   end
@@ -77,13 +77,13 @@ class ThreeWayMatchService
       exceptions << "Quantity variance #{(qv * 100).round(2)}% exceeds tolerance #{(@po.quantity_tolerance * 100).round(2)}%"
     end
     exceptions << "Vendor mismatch: invoice '#{@invoice.vendor}' vs PO '#{@po.vendor}'" unless vendor_ok
-    exceptions << 'Duplicate invoice number detected' if duplicate
+    exceptions << "Duplicate invoice number detected" if duplicate
     exceptions
   end
 
   def no_po_result
-    @invoice.update!(match_result: { exceptions: ['No linked purchase order'] }, processed_at: Time.current)
+    @invoice.update!(match_result: { exceptions: [ "No linked purchase order" ] }, processed_at: Time.current)
     @invoice.flag_exception!
-    { matched: false, exceptions: ['No linked purchase order'] }
+    { matched: false, exceptions: [ "No linked purchase order" ] }
   end
 end

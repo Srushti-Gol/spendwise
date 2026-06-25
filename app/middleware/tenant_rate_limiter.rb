@@ -4,7 +4,7 @@ class TenantRateLimiter
 
   def initialize(app)
     @app   = app
-    @redis = Redis.new(url: ENV.fetch('REDIS_URL', 'redis://localhost:6379'))
+    @redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
   end
 
   def call(env)
@@ -14,8 +14,8 @@ class TenantRateLimiter
     @redis.expire(key, WINDOW) if count == 1
 
     if count > LIMIT
-      return [429, { 'Content-Type' => 'application/json' },
-              [{ error: 'Rate limit exceeded', retry_after: WINDOW }.to_json]]
+      return [ 429, { "Content-Type" => "application/json" },
+              [ { error: "Rate limit exceeded", retry_after: WINDOW }.to_json ] ]
     end
 
     @app.call(env)
@@ -24,7 +24,7 @@ class TenantRateLimiter
   private
 
   def rate_limit_key(request)
-    tenant_id = request.env['HTTP_X_TENANT_ID'] || request.ip
+    tenant_id = request.env["HTTP_X_TENANT_ID"] || request.ip
     "rl:#{tenant_id}:#{Time.now.to_i / WINDOW}"
   end
 end

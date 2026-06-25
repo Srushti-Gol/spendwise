@@ -5,7 +5,7 @@ class PoGenerationService
   end
 
   def call
-    raise ArgumentError, 'Requisition must be approved' unless @requisition.approved?
+    raise ArgumentError, "Requisition must be approved" unless @requisition.approved?
 
     ActiveRecord::Base.transaction do
       po = PurchaseOrder.create!(
@@ -13,11 +13,11 @@ class PoGenerationService
         requisition:       @requisition,
         vendor:            derive_vendor,
         total_amount:      @requisition.total_amount,
-        currency:          @requisition.currency || 'USD',
+        currency:          @requisition.currency || "USD",
         created_by:        @created_by,
         price_tolerance:   0.05,
         quantity_tolerance: 0.02,
-        status:            'draft'
+        status:            "draft"
       )
 
       @requisition.purchase_order_items.each do |item|
@@ -31,7 +31,7 @@ class PoGenerationService
 
       @requisition.convert_to_order!
       AuditLog.record(
-        action: 'po_generated',
+        action: "po_generated",
         auditable: po,
         user: @created_by,
         ip_address: nil,
@@ -45,6 +45,6 @@ class PoGenerationService
   private
 
   def derive_vendor
-    @requisition.preferred_vendor.presence || 'TBD'
+    @requisition.preferred_vendor.presence || "TBD"
   end
 end

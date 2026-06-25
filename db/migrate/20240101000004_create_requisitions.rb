@@ -13,9 +13,9 @@ class CreateRequisitions < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     # Composite index - key to 706x approval-inbox speedup
-    add_index :requisitions, [:tenant_id, :current_approver_id, :status],
+    add_index :requisitions, [ :tenant_id, :current_approver_id, :status ],
               name: 'idx_requisitions_approval_inbox'
-    add_index :requisitions, [:tenant_id, :status, :created_at]
-    add_index :requisitions, [:tenant_id, :requester_id]
+    add_index :requisitions, [ :tenant_id, :status, :created_at ]
+    add_index :requisitions, [ :tenant_id, :requester_id ]
   end
 end

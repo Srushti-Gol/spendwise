@@ -13,20 +13,20 @@ class InvoiceExtractionJob < ApplicationJob
       validate_schema!(extracted)
 
       invoice.update!(
-        vendor:         extracted['vendor'],
-        invoice_number: extracted['invoice_number'],
-        invoice_date:   Date.parse(extracted['date']),
-        total_amount:   extracted['total_amount'],
-        currency:       extracted['currency'] || 'USD',
+        vendor:         extracted["vendor"],
+        invoice_number: extracted["invoice_number"],
+        invoice_date:   Date.parse(extracted["date"]),
+        total_amount:   extracted["total_amount"],
+        currency:       extracted["currency"] || "USD",
         extracted_data: extracted
       )
 
-      update_line_items(invoice, extracted['items'] || [])
+      update_line_items(invoice, extracted["items"] || [])
       auto_link_purchase_order(invoice)
       ThreeWayMatchService.new(invoice.reload).perform!
 
     rescue ArgumentError => e
-      invoice.update!(match_result: { exceptions: [e.message] })
+      invoice.update!(match_result: { exceptions: [ e.message ] })
       invoice.flag_exception!
       raise
     end
@@ -37,7 +37,7 @@ class InvoiceExtractionJob < ApplicationJob
   # In production: OpenRouter → GPT-4o-mini for PDFs (~2 s each),
   # Gemini 2.5 Flash for image scans. Offline heuristic fallback for CI.
   def extract_from_document(url)
-    return offline_heuristic_extraction if url.blank? || ENV['AI_OFFLINE'] == 'true'
+    return offline_heuristic_extraction if url.blank? || ENV["AI_OFFLINE"] == "true"
 
     # client = OpenAI::Client.new(api_key: ENV['OPENROUTER_API_KEY'], uri_base: 'https://openrouter.ai/api/v1')
     # response = client.chat(parameters: { model: 'openai/gpt-4o-mini', messages: pdf_prompt(url) })
@@ -47,12 +47,12 @@ class InvoiceExtractionJob < ApplicationJob
 
   def offline_heuristic_extraction
     {
-      'vendor'         => 'Sample Vendor Ltd',
-      'invoice_number' => "INV-#{SecureRandom.hex(4).upcase}",
-      'date'           => Date.today.iso8601,
-      'items'          => [],
-      'total_amount'   => 0.0,
-      'currency'       => 'USD'
+      "vendor"         => "Sample Vendor Ltd",
+      "invoice_number" => "INV-#{SecureRandom.hex(4).upcase}",
+      "date"           => Date.today.iso8601,
+      "items"          => [],
+      "total_amount"   => 0.0,
+      "currency"       => "USD"
     }
   end
 
@@ -65,10 +65,10 @@ class InvoiceExtractionJob < ApplicationJob
     invoice.invoice_items.destroy_all
     items.each do |item|
       invoice.invoice_items.create!(
-        description: item['description'] || 'Item',
-        quantity:    item['quantity'] || 1,
-        unit_price:  item['unit_price'] || 0,
-        total_price: item['total_price'] || 0
+        description: item["description"] || "Item",
+        quantity:    item["quantity"] || 1,
+        unit_price:  item["unit_price"] || 0,
+        total_price: item["total_price"] || 0
       )
     end
   end
