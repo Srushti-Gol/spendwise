@@ -46,8 +46,8 @@ module Api
       def spend_by_month
         Invoice.where(tenant: current_user.tenant)
                .where("invoice_date >= ?", 6.months.ago)
-               .group("DATE_TRUNC('month', invoice_date)")
-               .order("DATE_TRUNC('month', invoice_date)")
+               .group(Arel.sql("DATE_TRUNC('month', invoice_date)"))
+               .order(Arel.sql("DATE_TRUNC('month', invoice_date)"))
                .sum(:total_amount)
                .map { |month, total| { month: month, total: total } }
       end

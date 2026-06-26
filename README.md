@@ -25,17 +25,25 @@
 
 ## 📸 Screenshots
 
-| Login | Dashboard |
-|-------|-----------|
-| ![Login](screenshots/01_login.png) | ![Dashboard](screenshots/02_dashboard.png) |
+| Dashboard — KPI Cards + Spend Chart | Requisitions — Approval Inbox |
+|--------------------------------------|-------------------------------|
+| ![Dashboard](screenshots/01_dashboard.png) | ![Requisitions](screenshots/02_requisitions.png) |
 
-| Requisitions (Approval Inbox) | Purchase Orders |
-|-------------------------------|-----------------|
-| ![Requisitions](screenshots/03_requisitions.png) | ![Purchase Orders](screenshots/04_purchase_orders.png) |
+| Pending Approval (Multi-Level) | High-Value Requisition ($120k) |
+|--------------------------------|-------------------------------|
+| ![Pending Approval](screenshots/03_requisition_pending_approval.png) | ![High Value](screenshots/07_requisition_high_value.png) |
 
-| Invoices (3-Way Match Status) | Audit Log |
-|-------------------------------|-----------|
-| ![Invoices](screenshots/05_invoices.png) | ![Audit Log](screenshots/06_audit_log.png) |
+| Purchase Orders | Invoices — 3-Way Match Status |
+|-----------------|-------------------------------|
+| ![Purchase Orders](screenshots/04_purchase_orders.png) | ![Invoices](screenshots/05_invoices_3way_match.png) |
+
+| Invoice Exception (Price Variance) | Invoice Matched |
+|------------------------------------|-----------------|
+| ![Exception](screenshots/08_invoice_exception.png) | ![Matched](screenshots/09_invoice_matched.png) |
+
+| Audit Log — All Events | Audit Log — Filtered by Resource |
+|------------------------|----------------------------------|
+| ![Audit Log](screenshots/06_audit_log.png) | ![Audit Log Filtered](screenshots/10_audit_log_filtered.png) |
 
 ---
 
