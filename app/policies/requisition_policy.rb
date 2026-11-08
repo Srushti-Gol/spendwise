@@ -1,50 +1,23 @@
 class RequisitionPolicy < ApplicationPolicy
-  def index? = true
-  def show? = true
-  def create? = true
+  def create?  = true
+  def update?  = record.draft? && record.requester == user
+  def destroy? = role_at_least?('admin')
+  def submit?  = record.draft? && record.requester == user
+  def approve? = role_at_least?('manager') && record.current_approver == user
+  def reject?  = approve?
+  def cancel?  = record.requester == user || role_at_least?('admin')
 
-  def update?
-    record.draft? && (record.requester == user || admin?)
-  end
-
-  def destroy?
-    admin?
-  end
-
-  def submit?
-    record.draft? && record.requester == user
-  end
-
-  def approve?
-    record.pending? && record.current_approver == user && !self_approval?
-  end
-
-  def reject?
-    record.pending? && record.current_approver == user
-  end
-
-  def cancel?
-    (record.draft? || record.pending?) && (record.requester == user || manager?)
-  end
-
-  class Scope < Scope
+  class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.role.in?(%w[manager finance director admin])
-        base.where(tenant: user.tenant)
-            .where('requester_id = ? OR current_approver_id = ?', user.id, user.id)
+      scope = @scope.where(tenant: @user.tenant)
+      return scope if @user.role.in?(%w[finance director admin])
+
+      # Managers see own + their approval inbox
+      if @user.role == 'manager'
+        scope.where('requester_id = ? OR current_approver_id = ?', @user.id, @user.id)
       else
-        base.where(tenant: user.tenant, requester: user)
+        scope.where(requester: @user)
       end
     end
-
-    private
-
-    def base = @scope
-  end
-
-  private
-
-  def self_approval?
-    record.self_approval_blocked && record.requester == user
   end
 end
