@@ -2,31 +2,54 @@ module Api
   module V1
     class DashboardController < ApplicationController
       def stats
-        tenant = current_user.tenant
-
-        total_spend = Invoice.where(tenant: tenant, status: %w[matched approved paid])
-                             .sum(:total_amount)
-        pending_approvals = Requisition.where(tenant: tenant, status: 'pending')
-                                       .where(current_approver: current_user)
-                                       .count
-        matched_invoices = Invoice.where(tenant: tenant, status: 'matched').count
-        exception_invoices = Invoice.where(tenant: tenant, status: 'exception').count
-        open_pos = PurchaseOrder.where(tenant: tenant, status: %w[sent partial]).count
-
-        monthly_spend = Invoice.where(tenant: tenant)
-                               .where('created_at >= ?', 6.months.ago)
-                               .group("DATE_TRUNC('month', created_at)")
-                               .sum(:total_amount)
-                               .transform_keys { |k| k.strftime('%Y-%m') }
-
         render json: {
-          total_spend: total_spend,
-          pending_approvals: pending_approvals,
-          matched_invoices: matched_invoices,
-          exception_invoices: exception_invoices,
-          open_purchase_orders: open_pos,
-          monthly_spend: monthly_spend
+          requisitions: requisition_stats,
+          purchase_orders: po_stats,
+          invoices: invoice_stats,
+          spend_by_month: spend_by_month
         }
+      end
+
+      private
+
+      def requisition_stats
+        reqs = Requisition.where(tenant: current_user.tenant)
+        {
+          total: reqs.count,
+          draft: reqs.where(status: 'draft').count,
+          pending: reqs.where(status: 'pending').count,
+          approved: reqs.where(status: 'approved').count,
+          my_inbox: reqs.where(current_approver: current_user, status: 'pending').count
+        }
+      end
+
+      def po_stats
+        pos = PurchaseOrder.where(tenant: current_user.tenant)
+        {
+          total: pos.count,
+          open: pos.where(status: %w[sent partial]).count,
+          total_value: pos.sum(:total_amount)
+        }
+      end
+
+      def invoice_stats
+        invs = Invoice.where(tenant: current_user.tenant)
+        {
+          total: invs.count,
+          pending: invs.where(status: 'pending').count,
+          matched: invs.where(status: 'matched').count,
+          exceptions: invs.where(status: 'exception').count,
+          total_value: invs.sum(:total_amount)
+        }
+      end
+
+      def spend_by_month
+        Invoice.where(tenant: current_user.tenant)
+               .where('invoice_date >= ?', 6.months.ago)
+               .group("DATE_TRUNC('month', invoice_date)")
+               .order("DATE_TRUNC('month', invoice_date)")
+               .sum(:total_amount)
+               .map { |month, total| { month: month, total: total } }
       end
     end
   end
