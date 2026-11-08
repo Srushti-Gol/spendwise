@@ -4,7 +4,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :tenant
   belongs_to :requisition, optional: true
-  belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: 'User'
   has_many :purchase_order_items, dependent: :destroy
   has_many :goods_receipts, dependent: :destroy
   has_many :invoices, dependent: :nullify
@@ -14,7 +14,8 @@ class PurchaseOrder < ApplicationRecord
 
   validates :vendor, :total_amount, presence: true
   validates :total_amount, numericality: { greater_than: 0 }
-  validates :price_tolerance, :quantity_tolerance, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 1 }
+  validates :price_tolerance, :quantity_tolerance,
+            numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 1 }
 
   aasm column: :status do
     state :draft, initial: true
@@ -34,7 +35,8 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
-  def total_received
-    goods_receipts.joins(:goods_receipt_items).sum('goods_receipt_items.quantity_received')
+  def total_received_quantity
+    goods_receipts.joins(:goods_receipt_items)
+                  .sum('goods_receipt_items.quantity_received')
   end
 end
