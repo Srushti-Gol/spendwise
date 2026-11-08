@@ -1,33 +1,36 @@
 class ApplicationController < ActionController::API
   include Pundit::Authorization
-  before_action :authenticate_user!
+
+  before_action :authenticate_request!
   before_action :set_tenant
 
-  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from Pundit::NotAuthorizedError, with: :not_authorized
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from ActionController::ParameterMissing, with: :bad_request
+
+  attr_reader :current_user
 
   private
 
-  def authenticate_user!
+  def authenticate_request!
     token = request.headers['Authorization']&.split(' ')&.last
-    return render json: { error: 'Missing token' }, status: :unauthorized unless token
+    raise Pundit::NotAuthorizedError unless token
 
-    decoded = JsonWebToken.decode(token)
-    return render json: { error: 'Invalid token' }, status: :unauthorized unless decoded
-
-    @current_user = User.find_by(id: decoded[:user_id], jti: decoded[:jti])
-    render json: { error: 'Unauthorized' }, status: :unauthorized unless @current_user
-  end
-
-  def current_user
-    @current_user
+    payload = JWT.decode(token, jwt_secret, true, algorithm: 'HS256').first
+    @current_user = User.find(payload['user_id'])
+  rescue JWT::DecodeError, ActiveRecord::RecordNotFound
+    render json: { error: 'Invalid or expired token' }, status: :unauthorized
   end
 
   def set_tenant
     ActsAsTenant.current_tenant = current_user&.tenant
   end
 
-  def audit_action(action, record, changes: {})
+  def jwt_secret
+    ENV.fetch('JWT_SECRET', 'fallback_secret_change_in_production')
+  end
+
+  def audit(action, record, changes = {})
     AuditLog.record(
       user: current_user,
       action: action,
@@ -37,11 +40,15 @@ class ApplicationController < ActionController::API
     )
   end
 
-  def user_not_authorized
+  def not_authorized
     render json: { error: 'You are not authorized to perform this action' }, status: :forbidden
   end
 
-  def record_not_found
-    render json: { error: 'Record not found' }, status: :not_found
+  def not_found
+    render json: { error: 'Resource not found' }, status: :not_found
+  end
+
+  def bad_request(e)
+    render json: { error: e.message }, status: :bad_request
   end
 end
