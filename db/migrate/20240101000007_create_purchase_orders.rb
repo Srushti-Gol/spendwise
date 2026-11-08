@@ -14,7 +14,7 @@ class CreatePurchaseOrders < ActiveRecord::Migration[8.1]
       t.text :notes
       t.timestamps
     end
-    add_index :purchase_orders, [:tenant_id, :status]
-    add_index :purchase_orders, [:tenant_id, :vendor]
+    add_index :purchase_orders, %i[tenant_id status]
+    add_index :purchase_orders, %i[tenant_id vendor]
   end
 end
