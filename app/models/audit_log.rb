@@ -7,9 +7,9 @@ class AuditLog < ApplicationRecord
 
   validates :action, presence: true
 
-  # Append-only: prevent any updates or deletes
-  before_update { raise ActiveRecord::ReadOnlyRecord, 'AuditLog is append-only' }
-  before_destroy { raise ActiveRecord::ReadOnlyRecord, 'AuditLog is append-only' }
+  # Append-only — no updates or deletes allowed
+  before_update { raise ActiveRecord::ReadOnlyRecord }
+  before_destroy { raise ActiveRecord::ReadOnlyRecord }
 
   scope :recent, -> { order(created_at: :desc) }
   scope :for_resource, ->(type, id) { where(auditable_type: type, auditable_id: id) }
